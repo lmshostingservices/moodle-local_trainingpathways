@@ -1,0 +1,489 @@
+/* ── Training Pathways plugin styles ────────────────────────────────────── */
+/* ALL rules scoped to .path-local-trainingpathways to prevent global leakage */
+
+/* Progress bar */
+.path-local-trainingpathways .tp-progress-wrap {
+    background: #e9ecef;
+    border-radius: 999px;
+    height: 14px;
+    overflow: hidden;
+}
+.path-local-trainingpathways .tp-progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    background: #1565c0;
+}
+
+/* Stage timeline */
+.path-local-trainingpathways .tp-timeline {
+    position: relative;
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+}
+.path-local-trainingpathways .tp-stage {
+    position: relative;
+    margin-bottom: 1rem;
+}
+.path-local-trainingpathways .tp-stage-connector {
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: -1rem;
+    width: 2px;
+    background: #dee2e6;
+    z-index: 0;
+}
+.path-local-trainingpathways .tp-stage:last-child .tp-stage-connector {
+    display: none;
+}
+
+/* Stage header */
+.path-local-trainingpathways .tp-stage-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    position: relative;
+    z-index: 1;
+    transition: box-shadow 0.15s;
+}
+.path-local-trainingpathways .tp-stage-header:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Stage icon circle */
+.path-local-trainingpathways .tp-stage-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    border: 2px solid #dee2e6;
+    background: #f8f9fa;
+    color: #868e96;
+}
+.path-local-trainingpathways .tp-stage-icon.complete   { background: #e8f5e9; border-color: #2e7d32; color: #2e7d32; }
+.path-local-trainingpathways .tp-stage-icon.inprogress { background: #fff8e1; border-color: #f9a825; color: #f9a825; }
+.path-local-trainingpathways .tp-stage-icon.notstarted { background: #f8f9fa; border-color: #ced4da; color: #adb5bd; }
+
+/* Stage body */
+.path-local-trainingpathways .tp-stage-body {
+    flex: 1;
+    min-width: 0;
+}
+.path-local-trainingpathways .tp-stage-name {
+    font-weight: 600;
+    font-size: 0.97rem;
+    color: #212529;
+    margin: 0 0 0.1rem;
+}
+.path-local-trainingpathways .tp-stage-meta {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+.path-local-trainingpathways .tp-stage-badge {
+    font-size: 0.72rem;
+    padding: 0.2em 0.65em;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+}
+.path-local-trainingpathways .tp-badge-complete   { background: #d4edda; color: #155724; }
+.path-local-trainingpathways .tp-badge-inprogress { background: #fff3cd; color: #856404; }
+.path-local-trainingpathways .tp-badge-notstarted { background: #f1f3f5; color: #868e96; }
+
+/* Task list */
+.path-local-trainingpathways .tp-tasks {
+    margin: 0.5rem 0 0 3.5rem;
+    padding: 0;
+    list-style: none;
+    display: none;
+}
+.path-local-trainingpathways .tp-tasks.open { display: block; }
+.path-local-trainingpathways .tp-task-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 5px;
+    border: 1px solid #e9ecef;
+    background: #fafbfc;
+    margin-bottom: 0.4rem;
+    font-size: 0.88rem;
+}
+.path-local-trainingpathways .tp-task-icon { font-size: 1rem; flex-shrink: 0; }
+.path-local-trainingpathways .tp-task-name { flex: 1; min-width: 0; font-weight: 500; color: #343a40; }
+.path-local-trainingpathways .tp-task-name.complete { text-decoration: line-through; color: #868e96; }
+.path-local-trainingpathways .tp-task-desc { font-size: 0.79rem; color: #6c757d; margin-top: 0.1rem; }
+.path-local-trainingpathways .tp-task-badge-required { background: #cce5ff; color: #004085; font-size: 0.7rem;
+    padding: 0.15em 0.5em; border-radius: 3px; flex-shrink: 0; }
+.path-local-trainingpathways .tp-task-badge-optional  { background: #f1f3f5; color: #868e96; font-size: 0.7rem;
+    padding: 0.15em 0.5em; border-radius: 3px; flex-shrink: 0; }
+
+/* Task actions */
+.path-local-trainingpathways .tp-task-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; }
+.path-local-trainingpathways .tp-btn-sm {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s;
+    text-decoration: none;
+    color: #343a40;
+}
+.path-local-trainingpathways .tp-btn-sm:hover { background: #f0f0f0; }
+.path-local-trainingpathways .tp-btn-sm.primary { background: #1565c0; color: #fff; border-color: #1565c0; }
+.path-local-trainingpathways .tp-btn-sm.primary:hover { background: #0d47a1; }
+.path-local-trainingpathways .tp-btn-sm.success { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+.path-local-trainingpathways .tp-btn-sm.success:hover { background: #1b5e20; }
+.path-local-trainingpathways .tp-btn-sm.danger  { background: #c62828; color: #fff; border-color: #c62828; }
+.path-local-trainingpathways .tp-btn-sm.danger:hover  { background: #b71c1c; }
+
+/* Pathway cards (manage page) */
+.path-local-trainingpathways .tp-pathway-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.path-local-trainingpathways .tp-pathway-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.15s;
+}
+.path-local-trainingpathways .tp-pathway-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+.path-local-trainingpathways .tp-pathway-card-stripe {
+    height: 6px;
+}
+.path-local-trainingpathways .tp-pathway-card-body {
+    padding: 1rem;
+    flex: 1;
+}
+.path-local-trainingpathways .tp-pathway-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #212529;
+    margin: 0 0 0.3rem;
+}
+.path-local-trainingpathways .tp-pathway-card-desc {
+    font-size: 0.83rem;
+    color: #6c757d;
+    margin: 0 0 0.75rem;
+    max-height: 2.8em;
+    overflow: hidden;
+}
+.path-local-trainingpathways .tp-pathway-card-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #495057;
+    flex-wrap: wrap;
+}
+.path-local-trainingpathways .tp-pathway-card-stat strong { color: #212529; }
+.path-local-trainingpathways .tp-pathway-card-actions {
+    padding: 0.65rem 1rem;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    background: #fafbfc;
+}
+.path-local-trainingpathways .tp-archived-badge {
+    font-size: 0.72rem;
+    background: #f1f3f5;
+    color: #868e96;
+    padding: 0.15em 0.6em;
+    border-radius: 999px;
+    margin-left: 0.4rem;
+}
+
+/* Dashboard table */
+.path-local-trainingpathways .tp-team-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.path-local-trainingpathways .tp-team-table th {
+    padding: 0.5rem 0.75rem;
+    background: #f4f4f6;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    white-space: nowrap;
+}
+.path-local-trainingpathways .tp-team-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.path-local-trainingpathways .tp-team-table tr:hover td { background: #fafbfc; }
+.path-local-trainingpathways .tp-mini-bar-wrap { background: #e9ecef; border-radius: 999px; height: 8px; width: 100px; overflow: hidden; }
+.path-local-trainingpathways .tp-mini-bar      { height: 100%; border-radius: 999px; background: #1565c0; }
+
+/* Stat cards */
+.path-local-trainingpathways .tp-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.path-local-trainingpathways .tp-stat-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+.path-local-trainingpathways .tp-stat-value { font-size: 2rem; font-weight: 700; color: #1565c0; line-height: 1.1; }
+.path-local-trainingpathways .tp-stat-label { font-size: 0.8rem; color: #6c757d; margin-top: 0.2rem; }
+
+/* Editor page */
+.path-local-trainingpathways .tp-editor-stage {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    background: #fff;
+}
+.path-local-trainingpathways .tp-editor-stage-hdr {
+    padding: 0.6rem 0.9rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.path-local-trainingpathways .tp-editor-stage-body {
+    padding: 0.75rem;
+}
+.path-local-trainingpathways .tp-editor-task-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    background: #fafbfc;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+.path-local-trainingpathways .tp-editor-task-top-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.path-local-trainingpathways .tp-editor-task-bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding-left: 1.4rem;
+}
+.path-local-trainingpathways .tp-editor-task-row .handle { cursor: grab; color: #adb5bd; flex-shrink: 0; }
+
+/* Employee picker (assign page) */
+.path-local-trainingpathways .tp-emp-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.4rem 0.65rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    margin: 0;
+    font-weight: normal;
+    transition: background 0.1s;
+}
+.path-local-trainingpathways .tp-emp-item:last-of-type {
+    border-bottom: none;
+}
+.path-local-trainingpathways .tp-emp-item:hover {
+    background: #f0f6ff;
+}
+.path-local-trainingpathways .tp-emp-item-checked {
+    background: #e8f0fe;
+}
+.path-local-trainingpathways .tp-emp-item input[type="checkbox"] {
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+    cursor: pointer;
+}
+.path-local-trainingpathways .tp-emp-label {
+    min-width: 0;
+    line-height: 1.3;
+}
+.path-local-trainingpathways .tp-emp-name {
+    font-size: 0.88rem;
+    color: #212529;
+    font-weight: 500;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.path-local-trainingpathways .tp-emp-email {
+    font-size: 0.77rem;
+    color: #6c757d;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Colour swatches */
+.path-local-trainingpathways .tp-colour-swatches { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.path-local-trainingpathways .tp-colour-swatch {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.path-local-trainingpathways .tp-colour-swatch:hover { transform: scale(1.15); }
+.path-local-trainingpathways .tp-colour-swatch.selected { border-color: #212529; }
+
+/* Misc */
+.path-local-trainingpathways .tp-page-title { font-size: 1.4rem; font-weight: 700; color: #212529; margin: 0 0 0.2rem; }
+.path-local-trainingpathways .tp-page-subtitle { font-size: 0.9rem; color: #6c757d; margin: 0 0 1.5rem; }
+.path-local-trainingpathways .tp-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+.path-local-trainingpathways .tp-empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+/* ── Help boxes ─────────────────────────────────────────────────────────── */
+.path-local-trainingpathways .tp-help-box {
+    background: #f0f6ff;
+    border: 1px solid #c5d9f7;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+}
+.path-local-trainingpathways .tp-help-box summary {
+    padding: 0.65rem 1rem;
+    background: #e8f0fe;
+    border-bottom: 1px solid #c5d9f7;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #1a4a8a;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+}
+.path-local-trainingpathways .tp-help-box summary::-webkit-details-marker { display: none; }
+.path-local-trainingpathways .tp-help-box[open] summary {
+    border-bottom: 1px solid #c5d9f7;
+}
+.path-local-trainingpathways .tp-help-box-body {
+    padding: 0.9rem 1.1rem;
+}
+.path-local-trainingpathways .tp-help-intro {
+    font-size: 0.86rem;
+    color: #2d3748;
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+}
+.path-local-trainingpathways .tp-help-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+.path-local-trainingpathways .tp-help-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.85rem;
+    color: #2d3748;
+    line-height: 1.45;
+}
+.path-local-trainingpathways .tp-help-step-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #1565c0;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.15rem;
+    text-align: center;
+}
+.path-local-trainingpathways .tp-help-tip {
+    background: #fff;
+    border: 1px solid #d0e2ff;
+    border-radius: 5px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.82rem;
+    color: #495057;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    line-height: 1.45;
+}
+.path-local-trainingpathways .tp-help-tip-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+}
+.path-local-trainingpathways .tp-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+}
+.path-local-trainingpathways .tp-help-grid-item {
+    background: #fff;
+    border: 1px solid #d0e2ff;
+    border-radius: 5px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.82rem;
+    color: #343a40;
+    line-height: 1.4;
+}
+.path-local-trainingpathways .tp-help-grid-item strong {
+    display: block;
+    color: #1565c0;
+    margin-bottom: 0.1rem;
+    font-size: 0.79rem;
+}
+.path-local-trainingpathways .tp-help-section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #1a4a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0.75rem 0 0.35rem;
+}
+
+@media (max-width: 640px) {
+    .path-local-trainingpathways .tp-pathway-grid { grid-template-columns: 1fr; }
+    .path-local-trainingpathways .tp-stat-cards   { grid-template-columns: 1fr 1fr; }
+    .path-local-trainingpathways .tp-tasks        { margin-left: 1rem; }
+    .path-local-trainingpathways .tp-help-grid    { grid-template-columns: 1fr 1fr; }
+}

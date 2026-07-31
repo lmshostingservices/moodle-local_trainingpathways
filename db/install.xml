@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/trainingpathways/db" VERSION="20260602" COMMENT="Training Pathways tables">
+  <TABLES>
+
+    <!-- Pathway templates -->
+    <TABLE NAME="local_tp_pathways" COMMENT="Training pathway definitions">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name"        TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="colour"      TYPE="char" LENGTH="30"  NOTNULL="true" DEFAULT="blue"/>
+        <FIELD NAME="status"      TYPE="char" LENGTH="20"  NOTNULL="true" DEFAULT="active" COMMENT="active|archived"/>
+        <FIELD NAME="sortorder"   TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="createdby"   TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Stages within a pathway -->
+    <TABLE NAME="local_tp_stages" COMMENT="Stages within a training pathway">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pathwayid"   TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="name"        TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="sortorder"   TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"   TYPE="primary"  FIELDS="id"/>
+        <KEY NAME="pathwayid" TYPE="foreign"  FIELDS="pathwayid" REFTABLE="local_tp_pathways" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="pathwayid_sort" UNIQUE="false" FIELDS="pathwayid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Tasks within a stage -->
+    <TABLE NAME="local_tp_tasks" COMMENT="Tasks/items within a pathway stage">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="stageid"     TYPE="int"  LENGTH="10"  NOTNULL="true"/>
+        <FIELD NAME="name"        TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="tasktype"    TYPE="char" LENGTH="30"  NOTNULL="true" DEFAULT="task"
+                                  COMMENT="course|quiz|video|document|signoff|task"/>
+        <FIELD NAME="courseid"    TYPE="int"  LENGTH="10"  NOTNULL="false"
+                                  COMMENT="Moodle course id for course/quiz tasks"/>
+        <FIELD NAME="resourceurl" TYPE="text" NOTNULL="false"
+                                  COMMENT="URL for video/document tasks"/>
+        <FIELD NAME="required"    TYPE="int"  LENGTH="1"   NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="sortorder"   TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="stageid" TYPE="foreign" FIELDS="stageid" REFTABLE="local_tp_stages" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="stageid_sort" UNIQUE="false" FIELDS="stageid, sortorder"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- User pathway assignments -->
+    <TABLE NAME="local_tp_assignments" COMMENT="Users assigned to a training pathway">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="pathwayid"    TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid"       TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="assignedby"   TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timeassigned" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="targetdate"   TYPE="int" LENGTH="10" NOTNULL="false"
+                                   COMMENT="Optional target completion date (unix ts)"/>
+        <FIELD NAME="status"       TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="active"
+                                   COMMENT="active|completed|paused"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"   TYPE="primary" FIELDS="id"/>
+        <KEY NAME="pathwayid" TYPE="foreign" FIELDS="pathwayid" REFTABLE="local_tp_pathways" REFFIELDS="id"/>
+        <KEY NAME="userid"    TYPE="foreign" FIELDS="userid"    REFTABLE="user"              REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_status"    UNIQUE="false" FIELDS="userid, status"/>
+        <INDEX NAME="pathwayid_userid" UNIQUE="false" FIELDS="pathwayid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Task-level progress per assignment -->
+    <TABLE NAME="local_tp_progress" COMMENT="Per-task completion progress for each assignment">
+      <FIELDS>
+        <FIELD NAME="id"           TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="assignmentid" TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="taskid"       TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid"       TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="status"       TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="notstarted"
+                                   COMMENT="notstarted|inprogress|complete"/>
+        <FIELD NAME="signedoffby"  TYPE="int"  LENGTH="10" NOTNULL="false"
+                                   COMMENT="Manager userid who signed off (for signoff tasks)"/>
+        <FIELD NAME="notes"        TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="timemodified" TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary"      TYPE="primary" FIELDS="id"/>
+        <KEY NAME="assignmentid" TYPE="foreign" FIELDS="assignmentid" REFTABLE="local_tp_assignments" REFFIELDS="id"/>
+        <KEY NAME="taskid"       TYPE="foreign" FIELDS="taskid"       REFTABLE="local_tp_tasks"       REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="assignment_task" UNIQUE="true"  FIELDS="assignmentid, taskid"/>
+        <INDEX NAME="userid_status"   UNIQUE="false" FIELDS="userid, status"/>
+      </INDEXES>
+    </TABLE>
+
+  </TABLES>
+</XMLDB>
