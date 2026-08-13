@@ -1,5 +1,38 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * local_trainingpathways file.
+ *
+ * @package    local_trainingpathways
+ * @copyright  2026 LMS-Labs
+ * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ */
+
 require_once(__DIR__ . '/../../config.php');
+// Build safe POST data from Moodle param functions.
+$post_stage_names  = optional_param_array('stage_name', [], PARAM_TEXT);
+$post_stage_descs  = optional_param_array('stage_desc', [], PARAM_TEXT);
+$post_task_names   = optional_param_array('task_name', [], PARAM_RAW);
+$post_task_descs   = optional_param_array('task_desc', [], PARAM_RAW);
+$post_task_types   = optional_param_array('task_type', [], PARAM_RAW);
+$post_task_courses = optional_param_array('task_course', [], PARAM_RAW);
+$post_task_urls    = optional_param_array('task_url', [], PARAM_RAW);
+$post_task_reqs    = optional_param_array('task_required', [], PARAM_RAW);
+
 require_once(__DIR__ . '/lib.php');
 
 require_login();
@@ -78,8 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $DB->delete_records('local_tp_stages', ['pathwayid' => $pathwayid]);
 
-    $stageNames = $_POST['stage_name'] ?? [];
-    $stageDescs = $_POST['stage_desc'] ?? [];
+    $stageNames = optional_param_array('stage_name', [], PARAM_TEXT);
+    $stageDescs = optional_param_array('stage_desc', [], PARAM_TEXT);
 
     foreach ($stageNames as $sIdx => $sName) {
         $sName = clean_param($sName, PARAM_TEXT);
@@ -93,12 +126,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'timecreated' => $now,
         ]);
 
-        $taskNames  = $_POST['task_name'][$sIdx]  ?? [];
-        $taskDescs  = $_POST['task_desc'][$sIdx]  ?? [];
-        $taskTypes2 = $_POST['task_type'][$sIdx]  ?? [];
-        $taskCourse = $_POST['task_course'][$sIdx]?? [];
-        $taskUrl    = $_POST['task_url'][$sIdx]   ?? [];
-        $taskReq    = $_POST['task_required'][$sIdx] ?? [];
+        $taskNames  = $post_task_names[$sIdx] ?? [];
+        $taskDescs  = $post_task_descs[$sIdx] ?? [];
+        $taskTypes2 = $post_task_types[$sIdx] ?? [];
+        $taskCourse = $post_task_courses[$sIdx] ?? [];
+        $taskUrl    = $post_task_urls[$sIdx] ?? [];
+        $taskReq    = $post_task_reqs[$sIdx] ?? [];
 
         foreach ($taskNames as $tIdx => $tName) {
             $tName = clean_param($tName, PARAM_TEXT);
@@ -395,7 +428,7 @@ var _tpAllCourses = <?php echo json_encode(array_map('s', $allCourses)); ?>;
 var _tpTaskTypes  = <?php echo json_encode($taskTypes); ?>;
 
 function tpSelectColour(el) {
-    document.querySelectorAll('.tp-colour-swatch').forEach(function(s) { s.classList.remove('selected'); });
+    document.querySelectorAll('.tp-colour-swatch').forEach(function (s) { s.classList.remove('selected'); });
     el.classList.add('selected');
     document.getElementById('pathway_colour_input').value = el.dataset.colour;
 }
@@ -448,7 +481,7 @@ function tpAddStage() {
         + '</div></div>';
     document.getElementById('tp-stages-list').insertAdjacentHTML('beforeend', html);
     // Focus the new stage name field
-    setTimeout(function() {
+    setTimeout(function () {
         var inp = document.querySelector('#tp-stage-block-' + si + ' input[name^="stage_name"]');
         if (inp) inp.focus();
     }, 50);
@@ -495,7 +528,7 @@ function tpAddTask(si) {
     var list = document.getElementById('tp-task-list-' + si);
     if (!list) return;
     list.insertAdjacentHTML('beforeend', tpBuildTaskRow(si, ti));
-    setTimeout(function() {
+    setTimeout(function () {
         var inp = document.querySelector('#tp-task-' + si + '-' + ti + ' input[type="text"]');
         if (inp) inp.focus();
     }, 50);

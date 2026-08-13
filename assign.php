@@ -1,4 +1,27 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * local_trainingpathways file.
+ *
+ * @package    local_trainingpathways
+ * @copyright  2026 LMS-Labs
+ * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3 or later
+ */
+
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 
@@ -34,7 +57,7 @@ $notice = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
     $pid        = required_param('pathwayid',  PARAM_INT);
-    $userids    = $_POST['userids'] ?? [];
+    $userids    = optional_param_array('userids', [], PARAM_INT);
     $targetdate = optional_param('targetdate', '', PARAM_TEXT);
     $now        = time();
     $tdts       = $targetdate ? strtotime($targetdate) : null;
@@ -275,7 +298,7 @@ local_trainingpathways_render_header('assign');
 </div>
 
 <script>
-(function() {
+(function () {
     var searchEl  = document.getElementById('tp-emp-search');
     var listEl    = document.getElementById('tp-emp-list');
     var countEl   = document.getElementById('tp-emp-count');
@@ -298,11 +321,11 @@ local_trainingpathways_render_header('assign');
         }
     }
 
-    searchEl.addEventListener('input', function() {
+    searchEl.addEventListener('input', function () {
         var q = this.value.toLowerCase().trim();
         var items = listEl.querySelectorAll('.tp-emp-item');
         var visible = 0;
-        items.forEach(function(item) {
+        items.forEach(function (item) {
             var show = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
             item.style.display = show ? '' : 'none';
             if (show) visible++;
@@ -310,7 +333,7 @@ local_trainingpathways_render_header('assign');
         noResult.style.display = (visible === 0) ? '' : 'none';
     });
 
-    listEl.addEventListener('change', function(e) {
+    listEl.addEventListener('change', function (e) {
         if (e.target && e.target.type === 'checkbox') {
             var item = e.target.parentNode;
             if (item && item.classList.contains('tp-emp-item')) setCheckedStyle(item);
@@ -318,9 +341,9 @@ local_trainingpathways_render_header('assign');
         }
     });
 
-    selAllBtn.addEventListener('click', function(e) {
+    selAllBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        listEl.querySelectorAll('.tp-emp-item').forEach(function(item) {
+        listEl.querySelectorAll('.tp-emp-item').forEach(function (item) {
             if (item.style.display !== 'none') {
                 var cb = item.querySelector('input[type="checkbox"]');
                 if (cb) { cb.checked = true; setCheckedStyle(item); }
@@ -329,9 +352,9 @@ local_trainingpathways_render_header('assign');
         updateCount();
     });
 
-    clearBtn.addEventListener('click', function(e) {
+    clearBtn.addEventListener('click', function (e) {
         e.preventDefault();
-        listEl.querySelectorAll('.tp-emp-item').forEach(function(item) {
+        listEl.querySelectorAll('.tp-emp-item').forEach(function (item) {
             var cb = item.querySelector('input[type="checkbox"]');
             if (cb) { cb.checked = false; setCheckedStyle(item); }
         });
@@ -341,7 +364,7 @@ local_trainingpathways_render_header('assign');
     // Validate at least one employee ticked before submit
     var form = searchEl.closest('form');
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             var checked = listEl.querySelectorAll('input[type="checkbox"]:checked').length;
             if (checked === 0) {
                 e.preventDefault();
@@ -349,7 +372,7 @@ local_trainingpathways_render_header('assign');
                 searchEl.style.borderColor = '#dc3545';
                 countEl.style.color = '#dc3545';
                 countEl.textContent = 'Please select at least one employee.';
-                setTimeout(function() {
+                setTimeout(function () {
                     searchEl.style.borderColor = '';
                     countEl.style.color = '#495057';
                     updateCount();
