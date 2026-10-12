@@ -24,6 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['allocatedpathwaylocked'] = 'This pathway has learner history and cannot be deleted or edited. Archive it and create a new pathway for changed requirements.';
 $string['pluginname']              = 'Training Pathways';
 $string['trainingpathways']        = 'Training Pathways';
 $string['trainingpathways:view']   = 'View own training pathway';

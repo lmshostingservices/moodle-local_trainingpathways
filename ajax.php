@@ -46,51 +46,7 @@ try {
             $taskid       = required_param('taskid',       PARAM_INT);
             $newstatus    = required_param('status',       PARAM_ALPHA);
 
-            if (!in_array($newstatus, ['notstarted','inprogress','complete'], true)) {
-                throw new moodle_exception('invalidparam', 'local_trainingpathways');
-            }
-
-            $asgn = $DB->get_record('local_tp_assignments', ['id' => $assignmentid], '*', MUST_EXIST);
-
-            // User must be the assignee, or have viewall/signoff cap.
-            $isOwner   = ((int)$asgn->userid === (int)$USER->id);
-            $canSignoff= has_capability('local/trainingpathways:signoff', $context);
-            if (!$isOwner && !$canSignoff) {
-                throw new moodle_exception('accessdenied', 'local_trainingpathways');
-            }
-
-            $task = $DB->get_record('local_tp_tasks', ['id' => $taskid], '*', MUST_EXIST);
-            // Signoff tasks can only be completed by someone with signoff cap.
-            if ($task->tasktype === 'signoff' && !$canSignoff && $newstatus === 'complete') {
-                throw new moodle_exception('accessdenied', 'local_trainingpathways');
-            }
-
-            $now      = time();
-            $existing = $DB->get_record('local_tp_progress', ['assignmentid'=>$assignmentid,'taskid'=>$taskid]);
-            if ($existing) {
-                $DB->update_record('local_tp_progress', (object)[
-                    'id'           => $existing->id,
-                    'status'       => $newstatus,
-                    'signedoffby'  => ($task->tasktype==='signoff' && $newstatus==='complete') ? $USER->id : null,
-                    'timemodified' => $now,
-                ]);
-            } else {
-                $DB->insert_record('local_tp_progress', (object)[
-                    'assignmentid' => $assignmentid,
-                    'taskid'       => $taskid,
-                    'userid'       => (int)$asgn->userid,
-                    'status'       => $newstatus,
-                    'signedoffby'  => ($task->tasktype==='signoff' && $newstatus==='complete') ? $USER->id : null,
-                    'timemodified' => $now,
-                ]);
-            }
-
-            // Auto-complete assignment if 100%.
-            $prog = local_trainingpathways_assignment_progress($assignmentid);
-            if ($prog['percent'] >= 100) {
-                $DB->set_field('local_tp_assignments', 'status', 'completed', ['id'=>$assignmentid]);
-                $DB->set_field('local_tp_assignments', 'timemodified', $now,     ['id'=>$assignmentid]);
-            }
+            $prog = \local_trainingpathways\progress_service::mark($assignmentid, $taskid, $newstatus);
 
             echo json_encode(['ok' => true, 'progress' => $prog]);
             break;

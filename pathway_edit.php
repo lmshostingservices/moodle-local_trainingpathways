@@ -26,12 +26,12 @@ require_once(__DIR__ . '/../../config.php');
 // Build safe POST data from Moodle param functions.
 $post_stage_names  = optional_param_array('stage_name', [], PARAM_TEXT);
 $post_stage_descs  = optional_param_array('stage_desc', [], PARAM_TEXT);
-$post_task_names   = optional_param_array('task_name', [], PARAM_RAW);
-$post_task_descs   = optional_param_array('task_desc', [], PARAM_RAW);
-$post_task_types   = optional_param_array('task_type', [], PARAM_RAW);
-$post_task_courses = optional_param_array('task_course', [], PARAM_RAW);
-$post_task_urls    = optional_param_array('task_url', [], PARAM_RAW);
-$post_task_reqs    = optional_param_array('task_required', [], PARAM_RAW);
+$post_task_names   = optional_param_array('task_name', [], PARAM_TEXT);
+$post_task_descs   = optional_param_array('task_desc', [], PARAM_CLEANHTML);
+$post_task_types   = optional_param_array('task_type', [], PARAM_ALPHA);
+$post_task_courses = optional_param_array('task_course', [], PARAM_INT);
+$post_task_urls    = optional_param_array('task_url', [], PARAM_URL);
+$post_task_reqs    = optional_param_array('task_required', [], PARAM_BOOL);
 
 require_once(__DIR__ . '/lib.php');
 
@@ -40,6 +40,9 @@ $context = context_system::instance();
 require_capability('local/trainingpathways:manage', $context);
 
 $pathwayid = optional_param('id', 0, PARAM_INT);
+if ($pathwayid && $DB->record_exists('local_tp_assignments', ['pathwayid' => $pathwayid])) {
+    throw new moodle_exception('allocatedpathwaylocked', 'local_trainingpathways');
+}
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/trainingpathways/pathway_edit.php', $pathwayid ? ['id'=>$pathwayid] : []));

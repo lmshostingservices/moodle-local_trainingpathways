@@ -29,8 +29,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_trainingpathways';
-$plugin->version   = 2026060300;
-$plugin->requires  = 2022041900; // Moodle 4.0+
-$plugin->supported = [400, 500];
+$plugin->version   = 2026101201;
+$plugin->requires  = 2024042200; // Moodle 4.4.
+$plugin->supported = [404, 502];
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.9';
+$plugin->release   = '1.0.10';

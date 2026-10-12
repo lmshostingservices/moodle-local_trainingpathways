@@ -42,6 +42,9 @@ $PAGE->requires->css('/local/trainingpathways/styles.css');
 // ── Actions ────────────────────────────────────────────────────────────────
 if ($action === 'delete' && $pathwayid) {
     require_sesskey();
+    if ($DB->record_exists('local_tp_assignments', ['pathwayid' => $pathwayid])) {
+        throw new moodle_exception('allocatedpathwaylocked', 'local_trainingpathways');
+    }
     $DB->delete_records('local_tp_progress',    ['assignmentid' => $DB->get_field('local_tp_assignments', 'id', ['pathwayid'=>$pathwayid])]);
     $DB->delete_records('local_tp_assignments', ['pathwayid' => $pathwayid]);
     // Delete tasks for all stages

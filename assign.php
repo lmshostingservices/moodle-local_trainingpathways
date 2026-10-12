@@ -44,8 +44,7 @@ if ($revokeid) {
     require_sesskey();
     $asgn = $DB->get_record('local_tp_assignments', ['id' => $revokeid]);
     if ($asgn) {
-        $DB->delete_records('local_tp_progress',    ['assignmentid' => $revokeid]);
-        $DB->delete_records('local_tp_assignments', ['id'           => $revokeid]);
+        \local_trainingpathways\progress_service::revoke($revokeid);
     }
     redirect(new moodle_url('/local/trainingpathways/assign.php'),
         get_string('revoke_assignment', 'local_trainingpathways'), null,
@@ -57,6 +56,7 @@ $notice = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
     $pid        = required_param('pathwayid',  PARAM_INT);
+    $DB->get_record('local_tp_pathways', ['id' => $pid, 'status' => 'active'], '*', MUST_EXIST);
     $userids    = optional_param_array('userids', [], PARAM_INT);
     $targetdate = optional_param('targetdate', '', PARAM_TEXT);
     $now        = time();
@@ -69,20 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($userids as $uid) {
             $uid = (int)$uid;
             if (!$uid) continue;
+            $DB->get_record('user', ['id' => $uid, 'deleted' => 0, 'suspended' => 0], '*', MUST_EXIST);
             // Check for existing active assignment.
             if ($DB->record_exists('local_tp_assignments', ['pathwayid'=>$pid,'userid'=>$uid,'status'=>'active'])) {
                 $skipped++;
                 continue;
             }
-            $DB->insert_record('local_tp_assignments', (object)[
-                'pathwayid'    => $pid,
-                'userid'       => $uid,
-                'assignedby'   => $USER->id,
-                'timeassigned' => $now,
-                'targetdate'   => $tdts ?: null,
-                'status'       => 'active',
-                'timemodified' => $now,
-            ]);
+            \local_trainingpathways\progress_service::allocate($pid, $uid, $tdts ?: null);
         }
         $msg = get_string('assigned_ok', 'local_trainingpathways');
         if ($skipped) {

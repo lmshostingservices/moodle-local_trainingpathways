@@ -77,13 +77,13 @@ function local_trainingpathways_get_user_assignments(int $userid): array {
 function local_trainingpathways_assignment_progress(int $assignmentid): array {
     global $DB;
 
-    // Count all tasks in the pathway for this assignment.
+    // Required requirements alone determine completion; optional learning is not a blocker.
     $total = (int)$DB->count_records_sql(
         "SELECT COUNT(t.id)
            FROM {local_tp_tasks} t
            JOIN {local_tp_stages} s ON s.id = t.stageid
            JOIN {local_tp_assignments} a ON a.pathwayid = s.pathwayid
-          WHERE a.id = :aid",
+          WHERE a.id = :aid AND t.required = 1",
         ['aid' => $assignmentid]
     );
 
@@ -92,9 +92,13 @@ function local_trainingpathways_assignment_progress(int $assignmentid): array {
     }
 
     $complete = (int)$DB->count_records_sql(
-        "SELECT COUNT(p.id)
+        "SELECT COUNT(DISTINCT t.id)
            FROM {local_tp_progress} p
-          WHERE p.assignmentid = :aid AND p.status = 'complete'",
+           JOIN {local_tp_assignments} a ON a.id = p.assignmentid
+           JOIN {local_tp_tasks} t ON t.id = p.taskid
+           JOIN {local_tp_stages} s ON s.id = t.stageid AND s.pathwayid = a.pathwayid
+          WHERE p.assignmentid = :aid AND p.userid = a.userid
+            AND t.required = 1 AND p.status = 'complete'",
         ['aid' => $assignmentid]
     );
 
@@ -137,6 +141,9 @@ function local_trainingpathways_get_progress_map(int $assignmentid): array {
  * Returns: 'complete' | 'inprogress' | 'notstarted'
  */
 function local_trainingpathways_stage_status(array $tasks, array $progressMap): string {
+    $tasks = array_filter($tasks, static function ($task) {
+        return !empty($task->required);
+    });
     if (empty($tasks)) {
         return 'notstarted';
     }

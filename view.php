@@ -54,29 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postTid  = required_param('taskid',       PARAM_INT);
     $newStatus= required_param('status',       PARAM_ALPHA);
     $asgn     = $DB->get_record('local_tp_assignments', ['id'=>$postAid,'userid'=>$viewUserId], '*', MUST_EXIST);
-
-    $existing = $DB->get_record('local_tp_progress', ['assignmentid'=>$postAid,'taskid'=>$postTid]);
-    $now = time();
-    if ($existing) {
-        $DB->update_record('local_tp_progress', (object)[
-            'id'           => $existing->id,
-            'status'       => $newStatus,
-            'timemodified' => $now,
-        ]);
-    } else {
-        $DB->insert_record('local_tp_progress', (object)[
-            'assignmentid' => $postAid,
-            'taskid'       => $postTid,
-            'userid'       => $viewUserId,
-            'status'       => $newStatus,
-            'timemodified' => $now,
-        ]);
-    }
-    // Check if all required tasks now complete → auto-complete assignment.
-    $prog = local_trainingpathways_assignment_progress($postAid);
-    if ($prog['percent'] >= 100) {
-        $DB->set_field('local_tp_assignments', 'status', 'completed', ['id'=>$postAid]);
-    }
+    \local_trainingpathways\progress_service::mark($postAid, $postTid, $newStatus);
     redirect(new moodle_url('/local/trainingpathways/view.php',
         $viewUserId !== (int)$USER->id ? ['userid'=>$viewUserId,'assignmentid'=>$postAid] : []),
         get_string('task_updated','local_trainingpathways'), null,
@@ -88,7 +66,7 @@ $allAssignments = $DB->get_records_sql(
     "SELECT a.*, p.name AS pathwayname, p.colour AS pathwaycolour, p.description AS pathwaydesc
        FROM {local_tp_assignments} a
        JOIN {local_tp_pathways} p ON p.id = a.pathwayid
-      WHERE a.userid = :uid AND a.status IN ('active','completed')
+      WHERE a.userid = :uid AND a.status IN ('active','completed','revoked')
       ORDER BY a.timeassigned DESC",
     ['uid' => $viewUserId]
 );
@@ -210,6 +188,9 @@ if ((int)$viewUserId !== (int)$USER->id) {
           </div>
         </div>
 
+        <?php if ($currentAssignment->status === 'revoked'): ?>
+          <div class="alert alert-warning">This allocation was revoked. Its history is retained; no further changes are allowed.</div>
+        <?php endif; ?>
         <?php if ($currentAssignment->status === 'completed'): ?>
           <div style="margin-top:0.75rem;background:#e8f5e9;border-radius:4px;padding:0.5rem 0.75rem;font-size:0.88rem;color:#1b5e20;font-weight:600">
             &#10003; Pathway Complete — well done!
@@ -327,7 +308,8 @@ if ((int)$viewUserId !== (int)$USER->id) {
                 <?php if ($isSignoff): ?>
                   <?php if ($isDone): ?>
                     <span class="tp-btn-sm success" style="cursor:default">&#10003; <?php echo get_string('task_signed_off','local_trainingpathways'); ?></span>
-                  <?php elseif ($canSignoff && $viewUserId !== (int)$USER->id): ?>
+                  <?php elseif ($canSignoff && $viewUserId !== (int)$USER->id
+                      && $currentAssignment->status === 'active'): ?>
                     <!-- Manager can sign off inline -->
                     <form method="post" action="<?php echo $actionUrl->out(); ?>" style="display:inline">
                       <input type="hidden" name="sesskey"      value="<?php echo sesskey(); ?>">
@@ -342,7 +324,9 @@ if ((int)$viewUserId !== (int)$USER->id) {
                     </span>
                   <?php endif; ?>
 
-                <?php elseif ($viewUserId === (int)$USER->id || $canSignoff): ?>
+                <?php elseif (!in_array($task->tasktype, ['course', 'quiz'], true)
+                    && $currentAssignment->status === 'active'
+                    && ($viewUserId === (int)$USER->id || $canSignoff)): ?>
                   <form method="post" action="<?php echo $actionUrl->out(); ?>" style="display:inline">
                     <input type="hidden" name="sesskey"      value="<?php echo sesskey(); ?>">
                     <input type="hidden" name="assignmentid" value="<?php echo $currentAssignment->id; ?>">
